@@ -15,7 +15,11 @@ async def main():
         },
     ):
         print(f"Receiving new event of type: {chunk.event}...")
-        print(chunk.data)
+
+        if chunk.data and (messages := chunk.data.get('messages')):
+            print(messages[-1]['content'])
+
         print("\n\n")
+
 
 asyncio.run(main())

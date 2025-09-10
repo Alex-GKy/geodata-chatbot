@@ -1,44 +1,15 @@
-"""LangGraph chat agent for geodata questions."""
+"""LangGraph ReAct agent for geodata questions."""
 
-from __future__ import annotations
+from langchain_openai import ChatOpenAI
+from langgraph.prebuilt import create_react_agent
 
-from typing import Any, Dict, List, TypedDict
-from langchain_core.messages import BaseMessage, HumanMessage, AIMessage
+# Initialize the LLM
+llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 
-from langgraph.graph import StateGraph
-from langgraph.runtime import Runtime
+# Define tools (empty for now, we'll add geodata tools later)
+tools = []
 
-
-class Context(TypedDict):
-    """Context parameters for the agent."""
-    my_configurable_param: str
-
-
-class State(TypedDict):
-    """State for the chat agent."""
-    messages: List[BaseMessage]
-
-
-async def chat_node(state: State, runtime: Runtime[Context]) -> Dict[str, Any]:
-    """Process messages and return a response."""
-    messages = state.get("messages", [])
-    
-    if not messages:
-        return {"messages": [AIMessage(content="Hello! How can I help you with geodata questions?")]}
-    
-    last_message = messages[-1]
-    if isinstance(last_message, HumanMessage):
-        # Simple echo response for now
-        response = AIMessage(content=f"You asked: {last_message.content}")
-        return {"messages": messages + [response]}
-    
-    return {"messages": messages}
-
-
-# Define the graph
-graph = (
-    StateGraph(State, context_schema=Context)
-    .add_node("chat", chat_node)
-    .add_edge("__start__", "chat")
-    .compile(name="Geodata Chat Agent")
-)
+# Create the ReAct agent
+graph = create_react_agent(llm, tools,
+                           prompt="You are a helpful assistant, and an "
+                                  "expert in geospatial data analysis.")
