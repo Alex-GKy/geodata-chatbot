@@ -1,53 +1,44 @@
-"""LangGraph single-node graph template.
-
-Returns a predefined response. Replace logic and configuration as needed.
-"""
+"""LangGraph chat agent for geodata questions."""
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import Any, Dict, TypedDict
+from typing import Any, Dict, List, TypedDict
+from langchain_core.messages import BaseMessage, HumanMessage, AIMessage
 
 from langgraph.graph import StateGraph
 from langgraph.runtime import Runtime
 
 
 class Context(TypedDict):
-    """Context parameters for the agent.
-
-    Set these when creating assistants OR when invoking the graph.
-    See: https://langchain-ai.github.io/langgraph/cloud/how-tos/configuration_cloud/
-    """
-
+    """Context parameters for the agent."""
     my_configurable_param: str
 
 
-@dataclass
-class State:
-    """Input state for the agent.
-
-    Defines the initial structure of incoming data.
-    See: https://langchain-ai.github.io/langgraph/concepts/low_level/#state
-    """
-
-    changeme: str = "example"
+class State(TypedDict):
+    """State for the chat agent."""
+    messages: List[BaseMessage]
 
 
-async def call_model(state: State, runtime: Runtime[Context]) -> Dict[str, Any]:
-    """Process input and returns output.
-
-    Can use runtime context to alter behavior.
-    """
-    return {
-        "changeme": "output from call_model. "
-        f"Configured with {runtime.context.get('my_configurable_param')}"
-    }
+async def chat_node(state: State, runtime: Runtime[Context]) -> Dict[str, Any]:
+    """Process messages and return a response."""
+    messages = state.get("messages", [])
+    
+    if not messages:
+        return {"messages": [AIMessage(content="Hello! How can I help you with geodata questions?")]}
+    
+    last_message = messages[-1]
+    if isinstance(last_message, HumanMessage):
+        # Simple echo response for now
+        response = AIMessage(content=f"You asked: {last_message.content}")
+        return {"messages": messages + [response]}
+    
+    return {"messages": messages}
 
 
 # Define the graph
 graph = (
     StateGraph(State, context_schema=Context)
-    .add_node(call_model)
-    .add_edge("__start__", "call_model")
-    .compile(name="New Graph")
+    .add_node("chat", chat_node)
+    .add_edge("__start__", "chat")
+    .compile(name="Geodata Chat Agent")
 )
