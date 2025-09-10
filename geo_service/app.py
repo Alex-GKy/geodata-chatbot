@@ -39,7 +39,8 @@ def load_semantic_point_cloud(file_path, column_name='semantic_label'):
 
 
 # Let us control the output of
-raw_data = load_semantic_point_cloud('./DATA/indoor_room_labelled_minimal.csv')
+raw_data = load_semantic_point_cloud(
+    '../DATA/indoor_room_labelled_minimal.csv')
 # I sample here for replication goals
 # demo_data = raw_data.sample(n=100000, random_state=1)
 
@@ -478,6 +479,6 @@ def process_semantic_pointcloud_to_usd(input_path, output_usd, eps=0.8,
 
 
 # Complete pipeline execution
-process_semantic_pointcloud_to_usd('./DATA/indoor_room_labelled.csv',
+process_semantic_pointcloud_to_usd('agent/DATA/indoor_room_labelled.csv',
                                    'demo_scene_c.usda', eps=0.2,
                                    min_samples=20, distance_threshold=3.0)

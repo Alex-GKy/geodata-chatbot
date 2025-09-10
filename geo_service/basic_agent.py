@@ -20,9 +20,9 @@ print(f"Starting conversation with ID {conversation.id}")
 print("Loading USD file context...")
 
 # Read the content of minimal.usda
-usda_file = "DATA/demo_scene_c.usda"
+usda_file = "agent/DATA/demo_scene_c.usda"
 # usda_file = "minimal.usda"
-usda_file = "DATA/demo_scene_c_minimal.usda"
+usda_file = "../DATA/demo_scene_c_minimal.usda"
 
 with open(usda_file, "r") as f:
     usd_content = f.read()
@@ -44,7 +44,7 @@ def calculate_point_cloud_distance(object_id_1, object_id_2):
 
     """Calculate distance between two objects using point cloud data."""
     print(f"\nGetting objects from the point cloud file")
-    from app import objects
+    from basic_agent.geo_service.app import objects
 
     if object_id_1 not in objects or object_id_2 not in objects:
         return None

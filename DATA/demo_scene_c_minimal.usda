@@ -1,0 +1,90 @@
+#usda 1.0
+(
+    defaultPrim = "Scene"
+)
+
+def Xform "Scene" (
+    customData = {
+        string relationship_0 = "floor_0 -> chair_0 (adjacent)"
+        string relationship_1 = "floor_0 -> chair_1 (adjacent)"
+        string relationship_2 = "floor_0 -> table_0 (adjacent)"
+        string relationship_3 = "floor_0 -> table_1 (adjacent)"
+        string relationship_4 = "chair_0 -> chair_1 (adjacent)"
+        string relationship_5 = "chair_0 -> table_0 (near)"
+        string relationship_6 = "chair_0 -> table_1 (adjacent)"
+        string relationship_7 = "chair_1 -> table_0 (adjacent)"
+        string relationship_8 = "chair_1 -> table_1 (adjacent)"
+        string relationship_9 = "table_0 -> table_1 (near)"
+        int spatial_relationships_count = 10
+    }
+)
+{
+    def Scope "Geometry"
+    {
+        def Cube "floor_0" (
+            customData = {
+                int point_count = 46192
+                string semantic_label = "floor"
+                double volume = 0.3283501227102002
+            }
+        )
+        {
+            double size = 0.34494437341266915
+            double3 xformOp:translate = (3.716552703902191, -1.0190789282689643, -5.834062193294944)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+
+        def Cube "chair_0" (
+            customData = {
+                int point_count = 3041
+                string semantic_label = "chair"
+                double volume = 0.08652654095789526
+            }
+        )
+        {
+            double size = 0.2211497495182191
+            double3 xformOp:translate = (3.7115491914666228, 0.12478346936534035, -5.52200099777047)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+
+        def Cube "chair_1" (
+            customData = {
+                int point_count = 3017
+                string semantic_label = "chair"
+                double volume = 0.09881780022237219
+            }
+        )
+        {
+            double size = 0.23116126634849257
+            double3 xformOp:translate = (3.4827096467417964, -1.6848987744945312, -5.4984724405170695)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+
+        def Cube "table_0" (
+            customData = {
+                int point_count = 8855
+                string semantic_label = "table"
+                double volume = 0.24605032628781195
+            }
+        )
+        {
+            double size = 0.31331269055965155
+            double3 xformOp:translate = (3.777055961071711, -2.1527493407261438, -5.390480240597403)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+
+        def Cube "table_1" (
+            customData = {
+                int point_count = 8895
+                string semantic_label = "table"
+                double volume = 0.12769413394419346
+            }
+        )
+        {
+            double size = 0.25178333787205903
+            double3 xformOp:translate = (3.6780814466160763, -0.40364008793254635, -5.410734430321529)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+    }
+}
+
