@@ -34,6 +34,8 @@ if prompt := st.chat_input("Ask me anything about geodata..."):
 
     # Generate assistant response
     with st.chat_message("assistant"):
+        message_placeholder = st.empty()
+        
         try:
             # Create the input in the format expected by LangGraph
             input_data = {
@@ -42,26 +44,28 @@ if prompt := st.chat_input("Ask me anything about geodata..."):
                     "content": prompt
                 }]
             }
+            
+            # Show initial thinking indicator
+            message_placeholder.markdown("🤖 *Thinking...*")
+            
+            # Use LangGraph's token-level streaming
+            full_response = ""
+            for chunk in graph.stream(input_data, stream_mode="messages"):
+                # Check if chunk is an AIMessageChunk and get content
+                if chunk[0].type == "AIMessageChunk" and chunk[0].content:
+                    full_response += chunk[0].content
+                    message_placeholder.markdown(full_response + "▌")
 
-            # Call the graph directly - much simpler!
-            result = graph.invoke(input_data)
-
-            # Extract the assistant's response from the result
-            if "messages" in result and result["messages"]:
-                # Get the last message (should be from assistant)
-                last_message = result["messages"][-1]
-                if hasattr(last_message, 'content'):
-                    full_response = last_message.content
-                else:
-                    full_response = str(last_message)
+            # Remove cursor and show final response
+            if full_response:
+                message_placeholder.markdown(full_response)
             else:
                 full_response = "No response received"
-
-            st.markdown(full_response)
+                message_placeholder.markdown(full_response)
 
         except Exception as e:
             full_response = f"Error: {str(e)}"
-            st.markdown(full_response)
+            message_placeholder.markdown(full_response)
 
     # Add assistant response to chat history
     st.session_state.messages.append(
@@ -75,6 +79,7 @@ with st.sidebar:
     analysis.
     
     **Features:**
+    - Real-time streaming responses
     - Direct graph execution (no server needed)
     - Persistent chat history
     - Geospatial data expertise

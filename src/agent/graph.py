@@ -7,8 +7,8 @@ from langgraph.prebuilt import create_react_agent
 # Load environment variables
 load_dotenv(override=True)
 
-# Initialize the LLM
-llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+# Initialize the LLM with streaming enabled
+llm = ChatOpenAI(model="gpt-4o-mini", temperature=0, streaming=True)
 
 # llm = ChatOpenAI(
 #     base_url="http://localhost:1234/v1",
