@@ -3,23 +3,33 @@ import asyncio
 
 client = get_client(url="http://localhost:2024")
 
-async def main():
-    async for chunk in client.runs.stream(
-        None,  # Threadless run
-        "agent", # Name of assistant. Defined in langgraph.json.
-        input={
-        "messages": [{
-            "role": "human",
-            "content": "What is LangGraph?",
-            }],
-        },
-    ):
-        print(f"Receiving new event of type: {chunk.event}...")
+async def chat_loop():
+    print("Chat started. Type 'quit' to exit.")
+    
+    while True:
+        user_input = input("\nYou: ").strip()
+        
+        if user_input.lower() in ['quit', 'exit', 'q']:
+            print("Goodbye!")
+            break
+            
+        if not user_input:
+            continue
+            
+        print("Assistant: ", end="", flush=True)
+        
+        async for chunk in client.runs.stream(
+            None,  # Threadless run
+            "agent", # Name of assistant. Defined in langgraph.json.
+            input={
+                "messages": [{
+                    "role": "human",
+                    "content": user_input,
+                }],
+            },
+        ):
+            if chunk.data and (messages := chunk.data.get('messages')):
+                print(messages[-1]['content'], end="", flush=True)
 
-        if chunk.data and (messages := chunk.data.get('messages')):
-            print(messages[-1]['content'])
-
-        print("\n\n")
-
-
-asyncio.run(main())
+if __name__ == "__main__":
+    asyncio.run(chat_loop())
