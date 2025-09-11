@@ -27,12 +27,16 @@ async def chat_loop():
                     "content": user_input,
                 }],
             },
+            stream_mode="messages-tuple"
         ):
-            if chunk.data and (messages := chunk.data.get('messages')):
-                last_message = messages[-1]
-                # print only the LLM's messages, not the user's
-                if last_message.get('type') == 'ai':
-                    print(last_message['content'], end="", flush=True)
+            # print(f"Event: {chunk.event}")
+            if chunk.event != "messages":
+                continue
+
+            message_chunk, metadata = chunk.data
+            if message_chunk["content"]:
+                print(message_chunk["content"], end="", flush=True)
+
 
 if __name__ == "__main__":
     asyncio.run(chat_loop())
