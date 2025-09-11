@@ -1,7 +1,11 @@
 """LangGraph ReAct agent for geodata questions."""
 
+from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from langgraph.prebuilt import create_react_agent
+
+# Load environment variables
+load_dotenv(override=True)
 
 # Initialize the LLM
 llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)

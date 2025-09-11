@@ -11,6 +11,7 @@ dependencies = [
     "langgraph>=0.2.6",
     "python-dotenv>=1.0.1",
     "textual>=6.1.0",
+    "streamlit>=1.28.0",
 ]
 
 
