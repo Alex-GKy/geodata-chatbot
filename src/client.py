@@ -15,7 +15,7 @@ async def chat_loop():
             
         if not user_input:
             continue
-            
+        
         print("Assistant: ", end="", flush=True)
         
         async for chunk in client.runs.stream(
@@ -29,7 +29,10 @@ async def chat_loop():
             },
         ):
             if chunk.data and (messages := chunk.data.get('messages')):
-                print(messages[-1]['content'], end="", flush=True)
+                last_message = messages[-1]
+                # print only the LLM's messages, not the user's
+                if last_message.get('type') == 'ai':
+                    print(last_message['content'], end="", flush=True)
 
 if __name__ == "__main__":
     asyncio.run(chat_loop())
