@@ -6,6 +6,11 @@ from langgraph.prebuilt import create_react_agent
 # Initialize the LLM
 llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 
+# llm = ChatOpenAI(
+#     base_url="http://localhost:1234/v1",
+#     streaming=True
+# )
+
 # Define tools (empty for now, we'll add geodata tools later)
 tools = []
 

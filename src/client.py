@@ -15,7 +15,7 @@ async def chat_loop():
             
         if not user_input:
             continue
-            
+        
         print("Assistant: ", end="", flush=True)
         
         async for chunk in client.runs.stream(
@@ -27,9 +27,16 @@ async def chat_loop():
                     "content": user_input,
                 }],
             },
+            stream_mode="messages-tuple"
         ):
-            if chunk.data and (messages := chunk.data.get('messages')):
-                print(messages[-1]['content'], end="", flush=True)
+            # print(f"Event: {chunk.event}")
+            if chunk.event != "messages":
+                continue
+
+            message_chunk, metadata = chunk.data
+            if message_chunk["content"]:
+                print(message_chunk["content"], end="", flush=True)
+
 
 if __name__ == "__main__":
     asyncio.run(chat_loop())
