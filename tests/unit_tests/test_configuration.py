@@ -1,9 +1,12 @@
-from langgraph.pregel import Pregel
+from typing import Any
 
-from geo_service.basic_agent import graph
+def test_graph_imports() -> None:
+    # Import here to rely on sys.path injection from conftest
+    from agent import graph  # type: ignore
 
-
-def test_placeholder() -> None:
-    # TODO: You can add actual unit tests
-    # for your graph and other logic here.
-    assert isinstance(graph, Pregel)
+    # Minimal sanity checks without invoking external services
+    assert graph is not None
+    # The compiled graph should expose common methods
+    assert hasattr(graph, "invoke")
+    assert hasattr(graph, "ainvoke")
+    assert hasattr(graph, "stream")
