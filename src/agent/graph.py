@@ -1,10 +1,14 @@
 """LangGraph ReAct agent for geodata questions."""
 
+from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from langgraph.prebuilt import create_react_agent
 
-# Initialize the LLM
-llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+# Load environment variables
+load_dotenv(override=True)
+
+# Initialize the LLM with streaming enabled
+llm = ChatOpenAI(model="gpt-4o-mini", temperature=0, streaming=True)
 
 # llm = ChatOpenAI(
 #     base_url="http://localhost:1234/v1",
