@@ -12,7 +12,6 @@ from sklearn.cluster import DBSCAN
 # For visualization
 import open3d as o3d
 import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
 
 try:
     from pxr import Usd, UsdGeom, Sdf, Gf, UsdShade
