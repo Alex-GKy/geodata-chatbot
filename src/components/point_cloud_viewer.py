@@ -1,10 +1,11 @@
 """Point cloud viewer component for Streamlit."""
 
+import os
+
+import pandas as pd
 import streamlit as st
 import streamlit.components.v1 as components
-import pandas as pd
-import json
-import os
+
 
 def render_point_cloud_viewer(csv_file_path=None, height=800):
     """
@@ -31,8 +32,8 @@ def render_point_cloud_viewer(csv_file_path=None, height=800):
     <!DOCTYPE html>
     <html>
     <head>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+        <script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
+        <script src="https://unpkg.com/three@0.128.0/examples/js/controls/TrackballControls.js"></script>
         <style>
             body {{
                 margin: 0;
@@ -47,6 +48,11 @@ def render_point_cloud_viewer(csv_file_path=None, height=800):
                 position: relative;
                 border-radius: 8px;
                 overflow: hidden;
+                outline: none;
+            }}
+
+            #container:focus {{
+                border: 2px solid #4CAF50;
             }}
             #info {{
                 position: absolute;
@@ -94,15 +100,17 @@ def render_point_cloud_viewer(csv_file_path=None, height=800):
         </style>
     </head>
     <body>
-        <div id="container">
+        <div id="container" tabindex="0">
             <div id="info">
-                🖱️ Left drag: Rotate<br/>
+                🖱️ Left drag: Full 6-DOF rotation<br/>
                 🖱️ Right drag: Pan<br/>
-                🔄 Wheel: Zoom
+                🔄 Wheel: Zoom<br/>
+                💡 Try rotating near edges for roll
             </div>
             <div id="controls">
                 <button class="btn" onclick="resetView()">Reset View</button>
-                <button class="btn" onclick="toggleColors()">Toggle Colors</button>
+                <button class="btn" onclick="toggleColors()">Toggle 
+                Colors</button>
             </div>
             <div id="stats">
                 <div id="pointCount">Points: 0</div>
@@ -116,18 +124,28 @@ def render_point_cloud_viewer(csv_file_path=None, height=800):
             let pointsData = [];
 
             const labelColors = {{
-                1.0: [0.8, 0.2, 0.2], 2.0: [0.2, 0.8, 0.2], 3.0: [0.2, 0.2, 0.8],
-                4.0: [0.8, 0.8, 0.2], 5.0: [0.8, 0.2, 0.8], 6.0: [0.2, 0.8, 0.8],
-                7.0: [0.8, 0.5, 0.2], 8.0: [0.5, 0.8, 0.2], 9.0: [0.2, 0.5, 0.8],
+                1.0: [0.8, 0.2, 0.2], 2.0: [0.2, 0.8, 0.2], 3.0: [0.2, 0.2, 
+                0.8],
+                4.0: [0.8, 0.8, 0.2], 5.0: [0.8, 0.2, 0.8], 6.0: [0.2, 0.8, 
+                0.8],
+                7.0: [0.8, 0.5, 0.2], 8.0: [0.5, 0.8, 0.2], 9.0: [0.2, 0.5, 
+                0.8],
                 10.0: [0.8, 0.2, 0.5]
             }};
 
             function init() {{
+                if (typeof THREE === 'undefined') {{
+                    console.error('THREE.js not loaded properly');
+                    document.getElementById('container').innerHTML = '<div style="color: white; padding: 20px; text-align: center;">❌ Three.js library failed to load</div>';
+                    return;
+                }}
+
                 scene = new THREE.Scene();
                 scene.background = new THREE.Color(0x0e1117);
 
                 camera = new THREE.PerspectiveCamera(75,
-                    document.getElementById('container').clientWidth / {height}, 0.1, 1000);
+                    document.getElementById('container').clientWidth / 
+{height}, 0.1, 1000);
                 camera.position.set(0, 0, 10);
 
                 renderer = new THREE.WebGLRenderer({{ antialias: true }});
@@ -135,24 +153,65 @@ def render_point_cloud_viewer(csv_file_path=None, height=800):
                     document.getElementById('container').clientWidth,
                     {height}
                 );
-                document.getElementById('container').appendChild(renderer.domElement);
+                document.getElementById('container').appendChild(
+                renderer.domElement);
 
-                controls = new THREE.OrbitControls(camera, renderer.domElement);
-                controls.enableDamping = true;
-                controls.dampingFactor = 0.1;
+                // Use TrackballControls for full 6-DOF rotation including roll
+                controls = new THREE.TrackballControls(camera, 
+                renderer.domElement);
+                controls.rotateSpeed = 2.0;
+                controls.zoomSpeed = 1.2;
+                controls.panSpeed = 0.8;
+                controls.noZoom = false;
+                controls.noPan = false;
+                controls.staticMoving = true;
+                controls.dynamicDampingFactor = 0.3;
 
                 const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
                 scene.add(ambientLight);
-                const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+                const directionalLight = new THREE.DirectionalLight(
+                0xffffff, 0.8);
                 directionalLight.position.set(1, 1, 1);
                 scene.add(directionalLight);
 
                 animate();
 
+                // Auto focus the container
+                const container = document.getElementById('container');
+                container.focus();
+
+                // Add keyboard controls for roll
+                container.addEventListener('keydown', function(event) {{
+                    console.log('Key pressed:', event.code);
+                    if (event.code === 'KeyQ') {{
+                        // Roll left (rotate around camera's forward axis)
+                        camera.rotateZ(0.1);
+                        console.log('Rolling left');
+                        event.preventDefault();
+                    }} else if (event.code === 'KeyE') {{
+                        // Roll right
+                        camera.rotateZ(-0.1);
+                        console.log('Rolling right');
+                        event.preventDefault();
+                    }}
+                }});
+
+                // Also listen on document as fallback
+                document.addEventListener('keydown', function(event) {{
+                    if (event.code === 'KeyQ' || event.code === 'KeyE') {{
+                        container.dispatchEvent(new KeyboardEvent('keydown', 
+                        event));
+                    }}
+                }});
+
                 // Load data if provided
-                const csvData = {json.dumps(csv_data) if csv_data else 'null'};
-                if (csvData) {{
+                const csvDataString = `{csv_data if csv_data else 'null'}`;
+                if (csvDataString !== 'null') {{
+                    const csvData = JSON.parse(csvDataString);
+                    console.log('Loaded data:', csvData.length, 'points');
                     loadPointCloudData(csvData);
+                }} else {{
+                    console.log('No CSV data provided');
                 }}
             }}
 
@@ -168,17 +227,27 @@ def render_point_cloud_viewer(csv_file_path=None, height=800):
             }}
 
             function createPointCloud(points) {{
+                console.log('createPointCloud called with:', points);
                 if (pointCloud) {{
                     scene.remove(pointCloud);
                 }}
 
-                if (!points || points.length === 0) return;
+                if (!points || points.length === 0) {{
+                    console.log('No points provided or empty array');
+                    return;
+                }}
+
+                if (!Array.isArray(points)) {{
+                    console.error('Points is not an array:', typeof points);
+                    return;
+                }}
 
                 const geometry = new THREE.BufferGeometry();
                 const positions = new Float32Array(points.length * 3);
                 const colors = new Float32Array(points.length * 3);
 
-                const uniqueLabels = [...new Set(points.map(p => p.semantic_label))];
+                const uniqueLabels = [...new Set(points.map(p => 
+                p.semantic_label))];
                 document.getElementById('labelInfo').textContent =
                     `Labels: ${{uniqueLabels.sort().join(', ')}}`;
 
@@ -189,10 +258,13 @@ def render_point_cloud_viewer(csv_file_path=None, height=800):
                     positions[i * 3 + 1] = point.y;
                     positions[i * 3 + 2] = point.z;
 
-                    if (useSemanticColors && labelColors[point.semantic_label]) {{
+                    if (useSemanticColors && labelColors[
+                    point.semantic_label]) {{
                         colors[i * 3] = labelColors[point.semantic_label][0];
-                        colors[i * 3 + 1] = labelColors[point.semantic_label][1];
-                        colors[i * 3 + 2] = labelColors[point.semantic_label][2];
+                        colors[i * 3 + 1] = labelColors[
+                        point.semantic_label][1];
+                        colors[i * 3 + 2] = labelColors[
+                        point.semantic_label][2];
                     }} else {{
                         colors[i * 3] = point.R / 255;
                         colors[i * 3 + 1] = point.G / 255;
@@ -200,8 +272,10 @@ def render_point_cloud_viewer(csv_file_path=None, height=800):
                     }}
                 }}
 
-                geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-                geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+                geometry.setAttribute('position', new THREE.BufferAttribute(
+                positions, 3));
+                geometry.setAttribute('color', new THREE.BufferAttribute(
+                colors, 3));
 
                 const material = new THREE.PointsMaterial({{
                     size: 0.02,
@@ -213,10 +287,12 @@ def render_point_cloud_viewer(csv_file_path=None, height=800):
                 scene.add(pointCloud);
 
                 geometry.computeBoundingBox();
-                const center = geometry.boundingBox.getCenter(new THREE.Vector3());
+                const center = geometry.boundingBox.getCenter(new 
+                THREE.Vector3());
                 controls.target.copy(center);
 
-                document.getElementById('pointCount').textContent = `Points: ${{points.length}}`;
+                document.getElementById('pointCount').textContent = `Points: 
+                ${{points.length}}`;
 
                 const size = geometry.boundingBox.getSize(new THREE.Vector3());
                 const maxDim = Math.max(size.x, size.y, size.z);
@@ -229,8 +305,10 @@ def render_point_cloud_viewer(csv_file_path=None, height=800):
                 if (pointCloud) {{
                     const geometry = pointCloud.geometry;
                     geometry.computeBoundingBox();
-                    const center = geometry.boundingBox.getCenter(new THREE.Vector3());
-                    const size = geometry.boundingBox.getSize(new THREE.Vector3());
+                    const center = geometry.boundingBox.getCenter(new 
+                    THREE.Vector3());
+                    const size = geometry.boundingBox.getSize(new 
+                    THREE.Vector3());
                     const maxDim = Math.max(size.x, size.y, size.z);
 
                     camera.position.copy(center);
@@ -256,17 +334,22 @@ def render_point_cloud_viewer(csv_file_path=None, height=800):
     # Render the component
     components.html(html_template, height=height + 50)
 
-def show_point_cloud_button():
-    """Show a button to display the point cloud viewer."""
+
+def show_point_cloud_viewer():
+    """Show the point cloud viewer permanently in the sidebar."""
     # Use relative path from project root
-    csv_path = os.path.join(os.getcwd(), "DATA", "indoor_room_labelled_minimal.csv")
+    csv_path = os.path.join(os.getcwd(), "DATA",
+                            "indoor_room_labelled_minimal.csv")
 
-    if st.button("🌐 View Point Cloud", help="Open 3D point cloud visualization"):
-        st.markdown("### 🏠 Indoor Room Point Cloud Visualization")
-        st.markdown("*Interactive 3D viewer with semantic labels*")
+    st.markdown("*Interactive 3D viewer with semantic labels*")
 
-        if os.path.exists(csv_path):
-            render_point_cloud_viewer(csv_path, height=900)
+    if os.path.exists(csv_path):
+        render_point_cloud_viewer(csv_path, height=600)
+    else:
+        # Try alternative paths
+        alt_path = os.path.join("DATA", "indoor_room_labelled_minimal.csv")
+        if os.path.exists(alt_path):
+            render_point_cloud_viewer(alt_path, height=600)
         else:
-            st.error(f"Point cloud file not found: {csv_path}")
+            st.warning("⚠️ Point cloud data not found")
             st.info("Make sure the DATA folder contains 'indoor_room_labelled_minimal.csv'")
