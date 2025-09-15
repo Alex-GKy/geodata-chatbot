@@ -258,7 +258,8 @@ def render_point_cloud_viewer(csv_file_path=None, height=800):
 
 def show_point_cloud_button():
     """Show a button to display the point cloud viewer."""
-    csv_path = "/Users/alex/workspace-personal/portfolio-geospatial/geodata-chatbot/DATA/indoor_room_labelled_minimal.csv"
+    # Use relative path from project root
+    csv_path = os.path.join(os.getcwd(), "DATA", "indoor_room_labelled_minimal.csv")
 
     if st.button("🌐 View Point Cloud", help="Open 3D point cloud visualization"):
         st.markdown("### 🏠 Indoor Room Point Cloud Visualization")
