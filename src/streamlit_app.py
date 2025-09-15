@@ -97,7 +97,16 @@ if prompt := st.chat_input(
             for chunk in graph.stream(input_data, stream_mode="messages"):
                 # Check if chunk is an AIMessageChunk and get content
                 if chunk[0].type == "AIMessageChunk" and chunk[0].content:
-                    full_response += chunk[0].content
+                    # Ensure proper spacing between chunks
+                    chunk_content = chunk[0].content
+                    if full_response and not full_response.endswith(
+                            ' ') and not chunk_content.startswith(' '):
+                        # Add space if needed between chunks
+                        if not full_response.endswith(
+                                ('.', '!', '?', ':', '\n')):
+                            chunk_content = ' ' + chunk_content
+
+                    full_response += chunk_content
                     message_placeholder.markdown(full_response + "📍")
 
             # Remove cursor and show final response
