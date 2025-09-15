@@ -3,6 +3,7 @@
 import streamlit as st
 
 from src.agent.graph import graph
+from src.components.point_cloud_viewer import show_point_cloud_button, render_point_cloud_viewer
 
 # Initialize session state
 if "messages" not in st.session_state:
@@ -145,7 +146,13 @@ with st.sidebar:
     """)
     
     st.markdown("---")
-    
+
+    # Point Cloud Viewer
+    st.markdown("### 🌐 3D Visualization")
+    show_point_cloud_button()
+
+    st.markdown("---")
+
     # Enhanced clear button
     if st.button("🗑️ Clear Chat History", help="Clear all messages"):
         st.session_state.messages = []
