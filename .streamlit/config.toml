@@ -1,0 +1,6 @@
+[server]
+headless = true
+
+[global]
+# Specify the path to the main application file
+mainScript = "src/streamlit_app.py"

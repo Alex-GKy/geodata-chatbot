@@ -2,8 +2,8 @@
 
 import streamlit as st
 
-from src.agent.graph import graph
-from src.components.point_cloud_viewer import show_point_cloud_viewer
+from agent.graph import graph
+from components.point_cloud_viewer import show_point_cloud_viewer
 
 # Initialize session state
 if "messages" not in st.session_state:
@@ -19,8 +19,12 @@ st.set_page_config(
 
 # Load and apply custom CSS
 def load_css():
-    with open("src/styles.css") as f:
-        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+    try:
+        with open("styles.css") as f:
+            st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+    except FileNotFoundError:
+        # CSS file not found, continue without custom styling
+        pass
 
 
 load_css()

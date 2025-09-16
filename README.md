@@ -8,43 +8,47 @@ OPENAI_API_KEY="sk-proj-..."
 
 ### Option 1: Command Line Interface
 
-```python
-pip
-install - r
-requirements.txt
-python
-src / client.py
+```shell
+pip install - r requirements.txt
+python src / client.py
 ```
 
 ### Option 2: Terminal UI (TUI)
 
-```python
-python
-src / tui_client.py
+```shell
+python src / tui_client.py
 ```
 
 ### Option 3: Streamlit Web UI
 
-```python
+```shell
 # Install dependencies (if not already done)
-uv
-pip
-install
-streamlit
+uv pip install streamlit
 
 # Run the Streamlit app
-python
-run_streamlit.py
+python run_streamlit.py
 ```
 
-### Streamlit secrets
+## Streamlit Deployment
 
+### Secrets file
 When deployed to streamlit.io, the app will use
 secrets (https://docs.streamlit.io/develop/concepts/connections/secrets-management)
 These can be used locally as well and have to be put into .streamlit/secrets.toml
 
 The Streamlit app will be available at http://localhost:8501
 
-**Note:** Make sure the LangGraph server is running on localhost:2024 before using any of the clients.
+### Config file
+
+You need a .streamlit/config.toml file that contains setup for running locally:
+
+```toml
+[server]
+headless = true
+
+[global]
+# Specify the path to the main application file
+mainScript = "src/streamlit_app.py"
+```
 
 
