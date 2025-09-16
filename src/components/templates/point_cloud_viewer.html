@@ -2,7 +2,7 @@
 <html>
 <head>
     <script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
-    <script src="https://unpkg.com/three@0.128.0/examples/js/controls/TrackballControls.js"></script>
+    <script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <style>
         body {{
             margin: 0;
@@ -71,10 +71,8 @@
 <body>
     <div id="container" tabindex="0">
         <div id="info">
-            🖱️ Left drag: Full 6-DOF rotation<br/>
-            🖱️ Right drag: Pan<br/>
-            🔄 Wheel: Zoom<br/>
-            💡 Try rotating near edges for roll
+            🖱️ Left drag: Yaw & Pitch<br/>
+            🔄 Wheel: Zoom
         </div>
         <div id="controls">
             <button class="btn" onclick="resetView()">Reset View</button>
@@ -119,15 +117,20 @@
             );
             document.getElementById('container').appendChild(renderer.domElement);
 
-            // Use TrackballControls for full 6-DOF rotation including roll
-            controls = new THREE.TrackballControls(camera, renderer.domElement);
-            controls.rotateSpeed = 2.0;
-            controls.zoomSpeed = 1.2;
-            controls.panSpeed = 0.8;
-            controls.enablePan = false;
-            controls.enableZoom = false;
-            controls.staticMoving = true;
-            controls.dynamicDampingFactor = 0.3;
+            // Use OrbitControls for yaw/pitch rotation and zoom only
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.enablePan = false;    // Disable panning
+            controls.enableZoom = true;    // Allow zoom
+            controls.enableRotate = true;  // Allow rotation (yaw/pitch only)
+            controls.minDistance = 1;
+            controls.maxDistance = 500;
+
+            // Prevent roll by constraining polar angle and fixing screen space panning
+            controls.screenSpacePanning = false;
+            controls.minPolarAngle = 0;
+            controls.maxPolarAngle = Math.PI;
 
             const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
             scene.add(ambientLight);
@@ -141,28 +144,7 @@
             const container = document.getElementById('container');
             container.focus();
 
-            // Add keyboard controls for roll
-            container.addEventListener('keydown', function(event) {{
-                console.log('Key pressed:', event.code);
-                if (event.code === 'KeyQ') {{
-                    // Roll left (rotate around camera's forward axis)
-                    camera.rotateZ(0.1);
-                    console.log('Rolling left');
-                    event.preventDefault();
-                }} else if (event.code === 'KeyE') {{
-                    // Roll right
-                    camera.rotateZ(-0.1);
-                    console.log('Rolling right');
-                    event.preventDefault();
-                }}
-            }});
-
-            // Also listen on document as fallback
-            document.addEventListener('keydown', function(event) {{
-                if (event.code === 'KeyQ' || event.code === 'KeyE') {{
-                    container.dispatchEvent(new KeyboardEvent('keydown', event));
-                }}
-            }});
+            // No keyboard controls needed - only mouse zoom and rotation
 
             // Load data if provided
             const csvDataString = `{csv_data}`;
@@ -213,9 +195,14 @@
             for (let i = 0; i < points.length; i++) {{
                 const point = points[i];
 
-                positions[i * 3] = point.x;
-                positions[i * 3 + 1] = point.y;
-                positions[i * 3 + 2] = point.z;
+                // Apply -90-degree rotation around X-axis directly to the point data
+                const x = point.x;
+                const y = point.y * Math.cos(-Math.PI / 2) - point.z * Math.sin(-Math.PI / 2);
+                const z = point.y * Math.sin(-Math.PI / 2) + point.z * Math.cos(-Math.PI / 2);
+
+                positions[i * 3] = x;
+                positions[i * 3 + 1] = y;
+                positions[i * 3 + 2] = z;
 
                 if (useSemanticColors && labelColors[point.semantic_label]) {{
                     colors[i * 3] = labelColors[point.semantic_label][0];
