@@ -24,12 +24,17 @@ st.set_page_config(
 
 # Load and apply custom CSS
 def load_css():
-    try:
-        with open("styles.css") as f:
-            st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
-    except FileNotFoundError:
-        # CSS file not found, continue without custom styling
-        pass
+    # Try root styles.css first for compatibility, then src/styles.css
+    css_paths = ["styles.css", "src/styles.css"]
+    for path in css_paths:
+        try:
+            with open(path) as f:
+                st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+                return
+        except FileNotFoundError:
+            continue
+    # If neither exists, continue without custom styling
+    return
 
 
 load_css()

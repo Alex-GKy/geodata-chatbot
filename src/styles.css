@@ -55,22 +55,31 @@
     color: #1a1a1a !important;
 }
 
-/* Sidebar styling with better width control */
+/* Sidebar styling with adjustable width */
+/* Legacy class (varies by Streamlit version) */
 .css-1d391kg {
     background: linear-gradient(180deg, #e1f5fe 0%, #f3e5f5 100%);
-    min-width: 350px !important;
-    max-width: 80vw !important;
 }
 
-/* Alternative sidebar selectors for different Streamlit versions */
-section[data-testid="stSidebar"] {
-    min-width: 350px !important;
-    max-width: 80vw !important;
+/* Robust selectors across versions */
+aside[aria-label="sidebar"],
+section[data-testid="stSidebar"],
+div[data-testid="stSidebar"] {
+    /* Make sidebar take half width by default and not shrink */
+    min-width: 300px !important;
+    max-width: 100vw !important;
+    /* Allow user to resize horizontally */
+    resize: horizontal !important;
+    overflow: auto !important;
 }
 
-section[data-testid="stSidebar"] > div {
-    min-width: 350px !important;
-    max-width: 80vw !important;
+/* Ensure inner container follows same sizing rules */
+section[data-testid="stSidebar"] > div,
+div[data-testid="stSidebar"] > div,
+aside[aria-label="sidebar"] > div {
+    width: 100% !important;
+    min-width: 300px !important;
+    max-width: 100vw !important;
 }
 
 /* Metric cards with proper text contrast */
