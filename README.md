@@ -51,4 +51,15 @@ headless = true
 mainScript = "src/streamlit_app.py"
 ```
 
+### Password setting
+
+In the secrets.toml, set a password like so: 
+
+```toml
+PASSWORD="pass"
+DEBUG="true"
+```
+
+If the ```DEBUG``` flag is set to ```True```, the password check will be skipped
+
 

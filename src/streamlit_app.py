@@ -3,7 +3,12 @@
 import streamlit as st
 
 from agent.graph import graph
+from auth import check_password
 from components.point_cloud_viewer import show_point_cloud_viewer
+
+# Check password before showing app
+if not check_password():
+    st.stop()
 
 # Initialize session state
 if "messages" not in st.session_state:
