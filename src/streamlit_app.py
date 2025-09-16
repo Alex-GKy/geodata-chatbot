@@ -2,8 +2,13 @@
 
 import streamlit as st
 
-from src.agent.graph import graph
-from src.components.point_cloud_viewer import show_point_cloud_viewer
+from agent.graph import graph
+from auth import check_password
+from components.point_cloud_viewer import show_point_cloud_viewer
+
+# Check password before showing app
+if not check_password():
+    st.stop()
 
 # Initialize session state
 if "messages" not in st.session_state:
@@ -19,8 +24,17 @@ st.set_page_config(
 
 # Load and apply custom CSS
 def load_css():
-    with open("src/styles.css") as f:
-        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+    # Try root styles.css first for compatibility, then src/styles.css
+    css_paths = ["styles.css", "src/styles.css"]
+    for path in css_paths:
+        try:
+            with open(path) as f:
+                st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+                return
+        except FileNotFoundError:
+            continue
+    # If neither exists, continue without custom styling
+    return
 
 
 load_css()

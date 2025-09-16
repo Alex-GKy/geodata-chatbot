@@ -4,13 +4,16 @@ import os
 import shutil
 import tempfile
 
-from dotenv import load_dotenv
+import streamlit as st
 from langchain_community.agent_toolkits import FileManagementToolkit
 from langchain_openai import ChatOpenAI
 from langgraph.prebuilt import create_react_agent
 
-# Load environment variables
-load_dotenv(override=True)
+# Load secrets from Streamlit (works for both local .streamlit/secrets.toml and cloud)
+os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_API_KEY"]
+if "LANGCHAIN_API_KEY" in st.secrets:
+    os.environ["LANGCHAIN_API_KEY"] = st.secrets["LANGCHAIN_API_KEY"]
+
 
 # Create temporary workspace for file operations
 TEMP_WORKSPACE = tempfile.mkdtemp(prefix="geodata_workspace_")
