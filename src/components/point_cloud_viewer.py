@@ -28,7 +28,8 @@ def render_point_cloud_viewer(csv_file_path=None, height=800):
             return
 
     # Load HTML template from file
-    template_path = os.path.join(os.path.dirname(__file__), 'templates', 'point_cloud_viewer.html')
+    template_path = os.path.join(os.path.dirname(__file__), 'templates',
+                                 'point_cloud_viewer.html')
 
     try:
         with open(template_path, 'r', encoding='utf-8') as f:
@@ -54,7 +55,7 @@ def show_point_cloud_viewer():
     """Show the point cloud viewer permanently in the sidebar."""
     # Use relative path from project root
     csv_path = os.path.join(os.getcwd(), "DATA",
-                            "indoor_room_labelled_minimal.csv")
+                            "indoor_room_labelled_sparse.csv")
 
     st.markdown("*Interactive 3D viewer with semantic labels*")
 
@@ -67,4 +68,6 @@ def show_point_cloud_viewer():
             render_point_cloud_viewer(alt_path, height=600)
         else:
             st.warning("⚠️ Point cloud data not found")
-            st.info("Make sure the DATA folder contains 'indoor_room_labelled_minimal.csv'")
+            st.info(
+                "Make sure the DATA folder contains "
+                "'indoor_room_labelled_minimal.csv'")

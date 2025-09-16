@@ -106,9 +106,16 @@
             scene = new THREE.Scene();
             scene.background = new THREE.Color(0x0e1117);
 
+            const axesHelper = new THREE.AxesHelper(1.5); // size in units
+            scene.add(axesHelper);
+
             camera = new THREE.PerspectiveCamera(75,
                 document.getElementById('container').clientWidth / {height}, 0.1, 1000);
-            camera.position.set(0, 0, 10);
+            // Position the camera at a 45° angle above and back
+            camera.position.set(10, 10, 10); // X, Y, Z
+
+            // Make the camera look at the center of the scene
+            camera.lookAt(0, 0, 0);
 
             renderer = new THREE.WebGLRenderer({{ antialias: true }});
             renderer.setSize(
@@ -119,6 +126,9 @@
 
             // Use OrbitControls for yaw/pitch rotation and zoom only
             controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.target.set(0,0,0)
+            controls.update()
+
             controls.enableDamping = true;
             controls.dampingFactor = 0.05;
             controls.enablePan = false;    // Disable panning
@@ -195,20 +205,10 @@
             for (let i = 0; i < points.length; i++) {{
                 const point = points[i];
 
-                // Apply -90-degree rotation around X-axis, then +90-degree rotation around Y-axis
-                // First rotate around X-axis
-                let x1 = point.x;
-                let y1 = point.y * Math.cos(-Math.PI / 2) - point.z * Math.sin(-Math.PI / 2);
-                let z1 = point.y * Math.sin(-Math.PI / 2) + point.z * Math.cos(-Math.PI / 2);
-
-                // Then rotate around Y-axis
-                const x = x1 * Math.cos(Math.PI / 2) + z1 * Math.sin(Math.PI / 2);
-                const y = y1;
-                const z = -x1 * Math.sin(Math.PI / 2) + z1 * Math.cos(Math.PI / 2);
-
-                positions[i * 3] = x;
-                positions[i * 3 + 1] = y;
-                positions[i * 3 + 2] = z;
+                // No rotations - use original point data as-is
+                positions[i * 3] = point.x;
+                positions[i * 3 + 1] = point.y;
+                positions[i * 3 + 2] = point.z;
 
                 if (useSemanticColors && labelColors[point.semantic_label]) {{
                     colors[i * 3] = labelColors[point.semantic_label][0];
@@ -241,8 +241,11 @@
 
             const size = geometry.boundingBox.getSize(new THREE.Vector3());
             const maxDim = Math.max(size.x, size.y, size.z);
-            camera.position.copy(center);
-            camera.position.z += maxDim * 2;
+            camera.position.set(
+                center.x ,
+                center.y + maxDim * 1.01,
+                center.z + maxDim * 1.01
+            );
             controls.update();
         }}
 
