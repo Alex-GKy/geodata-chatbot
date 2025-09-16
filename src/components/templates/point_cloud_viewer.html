@@ -195,10 +195,16 @@
             for (let i = 0; i < points.length; i++) {{
                 const point = points[i];
 
-                // Apply -90-degree rotation around X-axis directly to the point data
-                const x = point.x;
-                const y = point.y * Math.cos(-Math.PI / 2) - point.z * Math.sin(-Math.PI / 2);
-                const z = point.y * Math.sin(-Math.PI / 2) + point.z * Math.cos(-Math.PI / 2);
+                // Apply -90-degree rotation around X-axis, then +90-degree rotation around Y-axis
+                // First rotate around X-axis
+                let x1 = point.x;
+                let y1 = point.y * Math.cos(-Math.PI / 2) - point.z * Math.sin(-Math.PI / 2);
+                let z1 = point.y * Math.sin(-Math.PI / 2) + point.z * Math.cos(-Math.PI / 2);
+
+                // Then rotate around Y-axis
+                const x = x1 * Math.cos(Math.PI / 2) + z1 * Math.sin(Math.PI / 2);
+                const y = y1;
+                const z = -x1 * Math.sin(Math.PI / 2) + z1 * Math.cos(Math.PI / 2);
 
                 positions[i * 3] = x;
                 positions[i * 3 + 1] = y;
