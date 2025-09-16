@@ -111,11 +111,6 @@
 
             camera = new THREE.PerspectiveCamera(75,
                 document.getElementById('container').clientWidth / {height}, 0.1, 1000);
-            // Position the camera at a 45° angle above and back
-            camera.position.set(10, 10, 10); // X, Y, Z
-
-            // Make the camera look at the center of the scene
-            camera.lookAt(0, 0, 0);
 
             renderer = new THREE.WebGLRenderer({{ antialias: true }});
             renderer.setSize(
@@ -131,7 +126,7 @@
 
             controls.enableDamping = true;
             controls.dampingFactor = 0.05;
-            controls.enablePan = false;    // Disable panning
+            controls.enablePan = true;     // Enable panning
             controls.enableZoom = true;    // Allow zoom
             controls.enableRotate = true;  // Allow rotation (yaw/pitch only)
             controls.minDistance = 1;
