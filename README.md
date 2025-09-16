@@ -1,5 +1,4 @@
-
-Create or edit the .env file in the top folder with the OpenAI API key: 
+Create or edit the .env file in the top folder with the OpenAI API key:
 
 ```
 OPENAI_API_KEY="sk-proj-..."
@@ -8,24 +7,41 @@ OPENAI_API_KEY="sk-proj-..."
 ## Running the Application
 
 ### Option 1: Command Line Interface
+
 ```python
-pip install -r requirements.txt
-python src/client.py
+pip
+install - r
+requirements.txt
+python
+src / client.py
 ```
 
 ### Option 2: Terminal UI (TUI)
+
 ```python
-python src/tui_client.py
+python
+src / tui_client.py
 ```
 
 ### Option 3: Streamlit Web UI
+
 ```python
 # Install dependencies (if not already done)
-uv pip install streamlit
+uv
+pip
+install
+streamlit
 
 # Run the Streamlit app
-python run_streamlit.py
+python
+run_streamlit.py
 ```
+
+### Streamlit secrets
+
+When deployed to streamlit.io, the app will use
+secrets (https://docs.streamlit.io/develop/concepts/connections/secrets-management)
+These can be used locally as well and have to be put into .streamlit/secrets.toml
 
 The Streamlit app will be available at http://localhost:8501
 
