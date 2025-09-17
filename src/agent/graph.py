@@ -21,13 +21,20 @@ DATA_DIR = os.path.join(
     os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "DATA")
 
 
-# Copy all USD files to workspace at startup
+# Copy specific files to workspace at startup
 def setup_workspace():
-    """Copy all USD files from DATA directory to temporary workspace."""
+    """Copy specific files from DATA directory to temporary workspace."""
+    # Hard-coded list of files to copy
+    files_to_copy = [
+        "demo_scene_c.usda",
+        #"indoor_room_labelled.csv",
+        # Add more files here as needed
+    ]
+
     if os.path.exists(DATA_DIR):
-        for file in os.listdir(DATA_DIR):
-            if file.endswith(('.usd', '.usda', '.usdc')):
-                source_path = os.path.join(DATA_DIR, file)
+        for file in files_to_copy:
+            source_path = os.path.join(DATA_DIR, file)
+            if os.path.exists(source_path):
                 dest_path = os.path.join(TEMP_WORKSPACE, file)
                 shutil.copy2(source_path, dest_path)
 
