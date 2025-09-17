@@ -9,6 +9,7 @@ from langchain_community.agent_toolkits import FileManagementToolkit
 from langchain_openai import ChatOpenAI
 from langgraph.prebuilt import create_react_agent
 from utils.config import is_mining_case_enabled
+from .mining_tools import MINING_TOOLS
 
 # Load secrets from Streamlit (works for both local .streamlit/secrets.toml
 # and cloud)
@@ -48,7 +49,7 @@ def setup_workspace():
 setup_workspace()
 
 # Initialize the LLM with streaming enabled
-llm = ChatOpenAI(model="gpt-4o-mini", temperature=0, streaming=True)
+llm = ChatOpenAI(model="gpt-4o", temperature=0, streaming=True)
 
 # llm = ChatOpenAI(
 #     base_url="http://localhost:1234/v1",
@@ -62,8 +63,13 @@ file_toolkit = FileManagementToolkit(
     selected_tools=["read_file", "list_directory", "file_search"]
 )
 
-# Define tools
+
+# Define tools based on mode
 tools = file_toolkit.get_tools()
+
+if is_mining_case_enabled():
+    # Add mining-specific tools
+    tools.extend(MINING_TOOLS)
 
 # Create the ReAct agent with mode-specific prompt
 if is_mining_case_enabled():
@@ -72,8 +78,14 @@ if is_mining_case_enabled():
               "You have access to a mining point cloud dataset."
               "Use 'list_directory' to see available files, but never attempt"
               "to open a csv file."
-              "Focus on mining-specific analysis like ore detection, "
-              "tunnel mapping, and geological formations.")
+              "You have multiple tools available to answer questions. If "
+              "asked for information about this mine, try to answer the "
+              "question using your tools. If you don't have relevant tools "
+              "available, tell the user so."
+              "Use these tools whenever required, but never attempt to read"
+              "the csv file yourself"
+              "If you can, avoid telling the user that you can't read the csv"
+              "file - only tell them if they specifically ask for it")
 else:
     prompt = ("You are a helpful assistant and expert in "
               "geospatial data analysis. "
