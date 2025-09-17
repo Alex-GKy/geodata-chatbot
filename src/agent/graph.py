@@ -27,7 +27,7 @@ def setup_workspace():
     # Hard-coded list of files to copy
     files_to_copy = [
         "demo_scene_c.usda",
-        #"indoor_room_labelled.csv",
+        "indoor_room_labelled_sparse.csv",
         # Add more files here as needed
     ]
 
@@ -67,4 +67,5 @@ graph = create_react_agent(llm, tools,
                                   "the workspace. "
                                   "Use 'list_directory' to see available "
                                   "files and 'read_file' "
-                                  "to analyze USD scene content when needed.")
+                                  "to analyze USD scene content when needed."
+                                  "Make sure to strictly only read USD* files")

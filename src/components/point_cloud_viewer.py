@@ -51,13 +51,63 @@ def render_point_cloud_viewer(csv_file_path=None, height=800):
     components.html(html_template, height=height + 50)
 
 
+def show_available_files():
+    """Show list of files available in the temporary workspace."""
+    try:
+        # Import here to avoid circular imports
+        from agent.graph import TEMP_WORKSPACE
+
+        if os.path.exists(TEMP_WORKSPACE):
+            files = [f for f in os.listdir(TEMP_WORKSPACE)
+                    if os.path.isfile(os.path.join(TEMP_WORKSPACE, f))]
+
+            if files:
+                st.markdown("### 📁 Available Files")
+
+                for file in sorted(files):
+                    file_path = os.path.join(TEMP_WORKSPACE, file)
+                    file_size = os.path.getsize(file_path)
+
+                    # Format file size
+                    if file_size < 1024:
+                        size_str = f"{file_size} B"
+                    elif file_size < 1024 * 1024:
+                        size_str = f"{file_size / 1024:.1f} KB"
+                    else:
+                        size_str = f"{file_size / (1024 * 1024):.1f} MB"
+
+                    # Choose icon based on file extension
+                    if file.endswith(('.usd', '.usda', '.usdc')):
+                        icon = "🎭"  # USD/3D files
+                    elif file.endswith(('.csv', '.tsv')):
+                        icon = "📊"  # Data files
+                    elif file.endswith(('.txt', '.log')):
+                        icon = "📄"  # Text files
+                    else:
+                        icon = "📁"  # Generic file
+
+                    st.markdown(f"{icon} **{file}** `({size_str})`")
+            else:
+                st.markdown("### 📁 Available Files")
+                st.info("No files currently loaded in workspace")
+        else:
+            st.warning("⚠️ Workspace not initialized")
+
+    except ImportError:
+        st.error("Unable to access workspace information")
+    except Exception as e:
+        st.error(f"Error listing files: {e}")
+
+
 def show_point_cloud_viewer():
     """Show the point cloud viewer permanently in the sidebar."""
     # Use relative path from project root
     csv_path = os.path.join(os.getcwd(), "DATA",
                             "indoor_room_labelled_sparse.csv")
 
-    st.markdown("*Interactive 3D viewer with semantic labels*")
+    # Show available files above the point cloud viewer
+    show_available_files()
+    st.markdown("---")
 
     if os.path.exists(csv_path):
         render_point_cloud_viewer(csv_path, height=600)
@@ -71,3 +121,4 @@ def show_point_cloud_viewer():
             st.info(
                 "Make sure the DATA folder contains "
                 "'indoor_room_labelled_minimal.csv'")
+
