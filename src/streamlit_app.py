@@ -141,14 +141,13 @@ if prompt := st.chat_input(
 with st.sidebar:
     st.markdown('<div class="sidebar-content">', unsafe_allow_html=True)
 
+    # Point Cloud Viewer - always visible
+    show_point_cloud_viewer()
+
     # Enhanced clear button
     if st.button("🗑️ Clear Chat History", help="Clear all messages"):
         st.session_state.messages = []
         st.rerun()
-
-    # Point Cloud Viewer - always visible
-    st.markdown("### 🌐 3D Visualization")
-    show_point_cloud_viewer()
 
     st.markdown("---")
 
