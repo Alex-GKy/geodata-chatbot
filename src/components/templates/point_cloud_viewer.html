@@ -66,10 +66,40 @@
             z-index: 100;
             font-family: monospace;
         }}
+        #loading {{
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.9);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            z-index: 200;
+            font-family: Arial, sans-serif;
+        }}
+        .spinner {{
+            border: 3px solid #333;
+            border-top: 3px solid #ff4b4b;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 10px auto;
+        }}
+        @keyframes spin {{
+            0% {{ transform: rotate(0deg); }}
+            100% {{ transform: rotate(360deg); }}
+        }}
     </style>
 </head>
 <body>
     <div id="container" tabindex="0">
+        <div id="loading">
+            <div class="spinner"></div>
+            <div>Loading point cloud...</div>
+        </div>
         <div id="info">
             🖱️ Left drag: Yaw & Pitch<br/>
             🔄 Wheel: Zoom
@@ -159,6 +189,7 @@
                 loadPointCloudData(csvData);
             }} else {{
                 console.log('No CSV data provided');
+                hideLoading();
             }}
         }}
 
@@ -242,6 +273,16 @@
                 center.z + maxDim * 1.01
             );
             controls.update();
+
+            // Hide loading animation when point cloud is ready
+            hideLoading();
+        }}
+
+        function hideLoading() {{
+            const loadingElement = document.getElementById('loading');
+            if (loadingElement) {{
+                loadingElement.style.display = 'none';
+            }}
         }}
 
         function resetView() {{
