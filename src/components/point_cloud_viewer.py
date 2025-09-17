@@ -6,6 +6,8 @@ import pandas as pd
 import streamlit as st
 import streamlit.components.v1 as components
 
+from utils.config import is_mining_case_enabled
+
 
 def render_point_cloud_viewer(csv_file_path=None, height=800):
     """
@@ -59,7 +61,7 @@ def show_available_files():
 
         if os.path.exists(TEMP_WORKSPACE):
             files = [f for f in os.listdir(TEMP_WORKSPACE)
-                    if os.path.isfile(os.path.join(TEMP_WORKSPACE, f))]
+                     if os.path.isfile(os.path.join(TEMP_WORKSPACE, f))]
 
             if files:
                 st.markdown("### 📁 Available Files")
@@ -101,24 +103,26 @@ def show_available_files():
 
 def show_point_cloud_viewer():
     """Show the point cloud viewer permanently in the sidebar."""
-    # Use relative path from project root
-    csv_path = os.path.join(os.getcwd(), "DATA",
-                            "indoor_room_labelled_sparse.csv")
+    """Show the point cloud viewer permanently in the sidebar."""
 
-    # Show available files above the point cloud viewer
-    show_available_files()
-    st.markdown("---")
+    # Select dataset based on secret
+    if is_mining_case_enabled():
+        st.markdown("# Underground mine dataset ⚒")
+        selected_dataset = "Mining (100k points)"
+        csv_filename = "3D_point_cloud_GT-100k.csv"
+    else:
+        selected_dataset = "Indoor Room (sparse)"
+        csv_filename = "indoor_room_labelled_sparse.csv"
+
+    # Only show available files when indoor room dataset is selected
+    if selected_dataset == "Indoor Room (sparse)":
+        show_available_files()
+        st.markdown("---")
+
+    csv_path = os.path.join(os.getcwd(), "DATA", csv_filename)
 
     if os.path.exists(csv_path):
         render_point_cloud_viewer(csv_path, height=600)
     else:
-        # Try alternative paths
-        alt_path = os.path.join("DATA", "indoor_room_labelled_minimal.csv")
-        if os.path.exists(alt_path):
-            render_point_cloud_viewer(alt_path, height=600)
-        else:
-            st.warning("⚠️ Point cloud data not found")
-            st.info(
-                "Make sure the DATA folder contains "
-                "'indoor_room_labelled_minimal.csv'")
-
+        st.warning(f"⚠️ Point cloud data not found: {csv_filename}")
+        st.info("Make sure the DATA folder contains the selected dataset")
