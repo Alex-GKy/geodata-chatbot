@@ -265,9 +265,9 @@
             const size = geometry.boundingBox.getSize(new THREE.Vector3());
             const maxDim = Math.max(size.x, size.y, size.z);
             camera.position.set(
-                center.x ,
-                center.y + maxDim * 1.01,
-                center.z + maxDim * 1.01
+                center.x + maxDim * 0.2,
+                center.y + maxDim * 0.5,
+                center.z + maxDim * 0.5
             );
             controls.update();
 
