@@ -204,6 +204,22 @@ aside[aria-label="sidebar"] > div {
     color: #1a1a1a;
 }
 
+/* Remove extra space at the top of sidebar */
+[data-testid="stSidebar"] {
+    padding-top: 0;
+    margin-top: -75px;  /* Adjust this value as needed to remove the exact amount of space */
+}
+
+/* Ensure content doesn't get hidden behind the header */
+[data-testid="stSidebar"] > div:first-child {
+    padding-top: 1rem;
+}
+
+/* Adjust the main content area to account for the sidebar changes */
+.main .block-container {
+    padding-top: 1rem;
+}
+
 /* Safari-specific optimizations for tablet */
 @supports (-webkit-appearance: none) {
     @media screen and (min-width: 768px) and (max-width: 1024px) {

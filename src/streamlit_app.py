@@ -29,7 +29,8 @@ def load_css():
     for path in css_paths:
         try:
             with open(path) as f:
-                st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+                st.markdown(f"<style>{f.read()}</style>",
+                            unsafe_allow_html=True)
                 return
         except FileNotFoundError:
             continue
@@ -132,8 +133,6 @@ if prompt := st.chat_input(
 
 # Enhanced sidebar with geodata theme
 with st.sidebar:
-    st.markdown('<div class="sidebar-content">', unsafe_allow_html=True)
-
     # Point Cloud Viewer - always visible
     show_point_cloud_viewer()
 
@@ -148,14 +147,16 @@ with st.sidebar:
         st.markdown("""
         <div class="feature-box">
             <h4>🛰️ Satellite Data Analysis</h4>
-            <p>Process and analyze satellite imagery and remote sensing data</p>
+            <p>Process and analyze satellite imagery and remote sensing 
+            data</p>
         </div>
         """, unsafe_allow_html=True)
 
         st.markdown("""
         <div class="feature-box">
             <h4>🗺️ GIS Operations</h4>
-            <p>Perform spatial analysis, mapping, and geographic calculations</p>
+            <p>Perform spatial analysis, mapping, and geographic 
+            calculations</p>
         </div>
         """, unsafe_allow_html=True)
 
