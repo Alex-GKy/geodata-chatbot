@@ -175,11 +175,8 @@
 
             animate();
 
-            // Auto focus the container
-            const container = document.getElementById('container');
-            container.focus();
-
             // No keyboard controls needed - only mouse zoom and rotation
+            // Removed auto-focus to prevent green border on tablet
 
             // Load data if provided
             const csvDataString = `{csv_data}`;
