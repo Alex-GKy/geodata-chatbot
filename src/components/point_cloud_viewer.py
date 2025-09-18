@@ -122,7 +122,9 @@ def show_point_cloud_viewer():
     csv_path = os.path.join(os.getcwd(), "DATA", csv_filename)
 
     if os.path.exists(csv_path):
-        render_point_cloud_viewer(csv_path, height=600)
+        # Use larger height for mining dataset, smaller for indoor room
+        height = 600 if is_mining_case_enabled() else 450
+        render_point_cloud_viewer(csv_path, height=height)
     else:
         st.warning(f"⚠️ Point cloud data not found: {csv_filename}")
         st.info("Make sure the DATA folder contains the selected dataset")
