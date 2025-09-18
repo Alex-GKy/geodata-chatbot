@@ -9,7 +9,7 @@ from langchain_community.agent_toolkits import FileManagementToolkit
 from langchain_openai import ChatOpenAI
 from langgraph.prebuilt import create_react_agent
 from utils.config import is_mining_case_enabled
-from .mining_tools import MINING_TOOLS
+from utils.mining_tools import MINING_TOOLS
 
 # Load secrets from Streamlit (works for both local .streamlit/secrets.toml
 # and cloud)
